@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wolverines — Rotation v3 (Honest)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F2027; --card: #1A3244; --card2: #264773; --text: #F1FAEE;
+    --accent: #FFD166; --green: #06D6A0; --orange: #FF6B35;
+    --blue: #4EA8DE; --purple: #9B5DE5; --red: #EF233C; --pink: #F72585;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); padding: 16px 14px 60px; line-height: 1.5; }
+  h1 { font-family: 'Fredoka One', cursive; font-size: 1.65rem; text-align: center; color: var(--accent); margin-bottom: 2px; }
+  .subtitle { text-align: center; color: #7EAAC8; font-size: 0.78rem; font-weight: 700; margin-bottom: 16px; }
+
+  .tabs { display: flex; gap: 5px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    font-family: 'Fredoka One', cursive; font-size: 0.72rem;
+    padding: 7px 10px; border-radius: 22px; border: 2px solid transparent;
+    background: var(--card); color: var(--text); cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active { background: var(--orange); color: white; border-color: var(--accent); transform: scale(1.03); }
+  .tab:hover:not(.active) { border-color: var(--orange); }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.07); }
+  .card h2 { font-family: 'Fredoka One', cursive; font-size: 1.15rem; color: var(--accent); margin-bottom: 3px; }
+  .card h3 { font-family: 'Fredoka One', cursive; font-size: 0.98rem; color: var(--text); margin: 14px 0 8px; }
+  .card .desc { font-size: 0.8rem; color: #9BC0DC; font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+
+  .highlight {
+    background: rgba(255,209,102,0.1); border: 2px solid var(--accent);
+    border-radius: 10px; padding: 10px 12px; font-size: 0.8rem; color: #FFE49A;
+    margin: 10px 0; line-height: 1.5;
+  }
+  .highlight strong { color: var(--accent); }
+
+  .warn {
+    background: rgba(239,35,60,0.08); border: 2px solid var(--red);
+    border-radius: 10px; padding: 10px 12px; font-size: 0.78rem; color: #FFB8C1;
+    margin: 10px 0; line-height: 1.5;
+  }
+  .warn strong { color: var(--red); }
+
+  .insight {
+    background: linear-gradient(135deg, rgba(247,37,133,0.08), rgba(155,93,229,0.08));
+    border: 1.5px solid var(--pink); border-radius: 10px;
+    padding: 10px 12px; font-size: 0.78rem; color: #F89BC4;
+    margin: 10px 0; line-height: 1.5;
+  }
+  .insight strong { color: var(--pink); }
+
+  /* PLAYER TIER */
+  .tier-block {
+    border-radius: 12px; padding: 13px; margin-bottom: 11px; border: 2px solid;
+  }
+  .tier-block.top { background: rgba(6,214,160,0.06); border-color: var(--green); }
+  .tier-block.mid { background: rgba(255,209,102,0.06); border-color: var(--accent); }
+  .tier-block.dev { background: rgba(155,93,229,0.06); border-color: var(--purple); }
+  .tier-block h3 { font-family: 'Fredoka One', cursive; margin: 0 0 6px; font-size: 1rem; }
+  .tier-block.top h3 { color: var(--green); }
+  .tier-block.mid h3 { color: var(--accent); }
+  .tier-block.dev h3 { color: var(--purple); }
+  .tier-players {
+    display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px;
+  }
+  .tp {
+    background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 7px;
+    font-family: 'Fredoka One', cursive; font-size: 0.78rem; color: var(--accent);
+    border: 1px solid rgba(255,209,102,0.25);
+  }
+  .tier-block p { font-size: 0.76rem; color: #C8D8E8; line-height: 1.45; margin: 0; }
+
+  /* ROLE CARDS */
+  .role-card {
+    background: rgba(255,255,255,0.04); border-radius: 12px;
+    padding: 12px; margin-bottom: 9px; border-left: 4px solid;
+  }
+  .role-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .role-name { font-family: 'Fredoka One', cursive; font-size: 1.02rem; }
+  .role-tag {
+    font-family: 'Fredoka One', cursive; font-size: 0.62rem;
+    padding: 3px 8px; border-radius: 10px; color: #0F2027;
+  }
+  .role-body { font-size: 0.78rem; color: #D8E8F0; line-height: 1.5; }
+  .role-body strong { color: var(--accent); }
+  .role-tips {
+    margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1);
+    font-size: 0.74rem; color: #9BC0DC;
+  }
+  .role-tips strong { color: var(--green); }
+
+  /* LINEUP CARDS */
+  .lineup-card {
+    border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 2px solid;
+  }
+  .lineup-card.a { background: rgba(6,214,160,0.06); border-color: var(--green); }
+  .lineup-card.b { background: rgba(155,93,229,0.06); border-color: var(--purple); }
+  .lineup-card.close { background: rgba(247,37,133,0.06); border-color: var(--pink); }
+  .lineup-card.press { background: rgba(255,107,53,0.06); border-color: var(--orange); }
+  .lineup-card.break { background: rgba(78,168,222,0.06); border-color: var(--blue); }
+
+  .lineup-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
+  .lineup-title { font-family: 'Fredoka One', cursive; font-size: 1rem; }
+  .lineup-card.a .lineup-title { color: var(--green); }
+  .lineup-card.b .lineup-title { color: var(--purple); }
+  .lineup-card.close .lineup-title { color: var(--pink); }
+  .lineup-card.press .lineup-title { color: var(--orange); }
+  .lineup-card.break .lineup-title { color: var(--blue); }
+
+  .when-badge { font-size: 0.68rem; color: #9BC0DC; font-weight: 700; text-align: right; line-height: 1.3; flex-shrink: 0; }
+
+  .lineup-players { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .lp {
+    background: rgba(255,255,255,0.08); padding: 5px 10px; border-radius: 7px;
+    font-family: 'Fredoka One', cursive; font-size: 0.76rem; color: var(--accent);
+    border: 1px solid rgba(255,209,102,0.3);
+  }
+  .lp .role-subtitle {
+    display: block; font-size: 0.58rem; color: #9BC0DC; font-family: 'Nunito'; font-weight: 700; margin-top: 1px;
+  }
+
+  .lineup-desc {
+    font-size: 0.75rem; color: #C8D8E8; line-height: 1.5;
+    padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .lineup-desc strong { color: var(--accent); }
+  .lineup-desc em { color: var(--green); font-style: normal; font-weight: 700; }
+
+  /* RULES */
+  .rule-card {
+    background: rgba(255,255,255,0.04); border-radius: 10px;
+    padding: 11px 12px; margin-bottom: 9px; border-left: 4px solid;
+    font-size: 0.79rem; color: #D8E8F0; line-height: 1.5;
+  }
+  .rule-card.golden { border-left-color: var(--accent); }
+  .rule-card.avoid { border-left-color: var(--red); }
+  .rule-card.always { border-left-color: var(--green); }
+  .rule-card.max { border-left-color: var(--blue); }
+  .rule-card .rule-tag {
+    font-family: 'Fredoka One', cursive; font-size: 0.7rem;
+    display: inline-block; padding: 2px 8px; border-radius: 10px; margin-right: 6px;
+  }
+  .rule-card.golden .rule-tag { background: var(--accent); color: #0F2027; }
+  .rule-card.avoid .rule-tag { background: var(--red); color: white; }
+  .rule-card.always .rule-tag { background: var(--green); color: #0F2027; }
+  .rule-card.max .rule-tag { background: var(--blue); color: #0F2027; }
+  .rule-card strong { color: var(--accent); }
+
+  /* SHIFT */
+  .shift-card {
+    background: rgba(255,255,255,0.04); border-radius: 11px;
+    padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid;
+  }
+  .shift-card.a { border-left-color: var(--green); }
+  .shift-card.b { border-left-color: var(--purple); }
+  .shift-card.hybrid { border-left-color: var(--accent); background: rgba(255,209,102,0.05); }
+  .shift-card.close { border-left-color: var(--pink); background: rgba(247,37,133,0.06); }
+  .shift-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .shift-time { font-family: 'Fredoka One', cursive; font-size: 0.88rem; }
+  .shift-card.a .shift-time { color: var(--green); }
+  .shift-card.b .shift-time { color: var(--purple); }
+  .shift-card.hybrid .shift-time { color: var(--accent); }
+  .shift-card.close .shift-time { color: var(--pink); }
+  .shift-label { font-size: 0.65rem; color: #9BC0DC; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
+  .on-floor { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .of-player {
+    padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800;
+    background: rgba(255,255,255,0.08); color: var(--text);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .of-player.star { background: rgba(255,209,102,0.2); color: var(--accent); border-color: var(--accent); }
+
+  .half-divider {
+    font-family: 'Fredoka One', cursive; color: var(--pink); font-size: 1rem;
+    text-align: center; margin: 12px 0 10px; padding: 7px;
+    background: rgba(247,37,133,0.07); border: 1px dashed var(--pink); border-radius: 8px;
+  }
+
+  /* MATCHUPS */
+  .matchup {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center;
+    background: rgba(255,255,255,0.04); border-radius: 10px; padding: 9px 11px;
+    margin-bottom: 7px; font-size: 0.8rem;
+  }
+  .matchup-our { color: var(--accent); font-weight: 800; }
+  .matchup-arrow { color: var(--red); font-size: 0.8rem; }
+  .matchup-their { color: #C8D8E8; font-weight: 600; }
+
+  /* SITUATIONS */
+  .sit-card {
+    background: rgba(255,255,255,0.04); border-radius: 10px;
+    padding: 11px 12px; margin-bottom: 9px; border-left: 3px solid var(--purple);
+  }
+  .sit-title { font-family: 'Fredoka One', cursive; color: var(--purple); font-size: 0.9rem; margin-bottom: 4px; }
+  .sit-card p { font-size: 0.76rem; color: #D8E8F0; margin: 0; line-height: 1.5; }
+  .sit-card p strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>🐺 Rotation v3 — Honest</h1>
+<p class="subtitle">10 players · Real strengths, real gaps</p>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('truth')">💡 The Truth</button>
+  <button class="tab" onclick="showTab('tiers')">🎚️ Tiers</button>
+  <button class="tab" onclick="showTab('roles')">🎭 Roles</button>
+  <button class="tab" onclick="showTab('rules')">📏 Rules</button>
+  <button class="tab" onclick="showTab('units')">👥 Units</button>
+  <button class="tab" onclick="showTab('lineups')">🎯 Special</button>
+  <button class="tab" onclick="showTab('rotation')">⏱️ Chart</button>
+  <button class="tab" onclick="showTab('matchups')">🛡️ Matchups</button>
+</div>
+
+<!-- ================ THE TRUTH ================ -->
+<div class="section active" id="truth">
+
+  <div class="card">
+    <h2>💡 The Honest Picture</h2>
+    <p class="desc">Every youth team has a top group and a bottom group. Yours is the same. Naming it clearly is the first step.</p>
+
+    <div class="insight">
+      <strong>⭐ Your Top 5 is clear:</strong> Evan, Teddy, Jesse, Oren, Ben. All five can shoot, all have real skill, all can function in any role you ask.
+    </div>
+
+    <div class="insight">
+      <strong>🥇 Your Big 3 of scoring:</strong> Evan (#1), Teddy (#2), Jesse (#3). Only real scorers on the team. If these 3 don't produce, you don't win.
+    </div>
+
+    <div class="insight">
+      <strong>🎯 Evan is still the engine.</strong> Lefty, top lateral quickness, top first step, leader, glue guy. Keep him lefty-attacking.
+    </div>
+
+    <div class="insight">
+      <strong>🧩 Jordan is your clear 6th man.</strong> He's the bridge between your Top 5 and your bottom group — reliable enough to anchor Unit B when it matters.
+    </div>
+
+    <div class="warn">
+      <strong>⚠️ The real challenge:</strong> Your weakest 5 (Max, Eli, Akiva, Luca, Jordan) must play 16 min each = 80 combined minutes of your 160-minute game (half of all minutes). Your job isn't to win with them — it's to <em>not lose too much</em> with them and help them grow.
+    </div>
+
+    <div class="warn">
+      <strong>🚫 Max reality check:</strong> Weakest player, can't shoot, pace gap. He plays because the league says everyone plays. His role: <strong>survive, don't hurt us, get small wins.</strong> Put him in situations he CAN succeed in (screen, rebound, simple pass).
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ TIERS ================ -->
+<div class="section" id="tiers">
+
+  <div class="card">
+    <h2>🎚️ The 3 Tiers of Your Team</h2>
+    <p class="desc">Understanding who belongs where is the foundation of every rotation decision.</p>
+
+    <div class="tier-block top">
+      <h3>⭐ TIER 1 — Top 5 (Your Core)</h3>
+      <div class="tier-players">
+        <span class="tp">Evan</span><span class="tp">Teddy</span><span class="tp">Jesse</span><span class="tp">Oren</span><span class="tp">Ben</span>
+      </div>
+      <p>All 5 can shoot from 10+ feet. All have real skill. They're your starters and closers. In a perfect world, these 5 are always on the floor — but minutes rules force you to rest them.</p>
+    </div>
+
+    <div class="tier-block mid">
+      <h3>🧩 TIER 2 — The Bridges</h3>
+      <div class="tier-players">
+        <span class="tp">Jordan</span><span class="tp">Luca</span>
+      </div>
+      <p>Your 6th and 7th men. Jordan is the clear 6th — experienced, calm, reliable. Luca has decent lateral quickness. These two are the glue when you have to rest Tier 1 players. You can survive stretches with them on the floor.</p>
+    </div>
+
+    <div class="tier-block dev">
+      <h3>📈 TIER 3 — Development Tier</h3>
+      <div class="tier-players">
+        <span class="tp">Akiva</span><span class="tp">Eli</span><span class="tp">Max</span>
+      </div>
+      <p>They play because they have to play — and because every kid deserves to improve. Focus: keep possessions simple, pair them with strong teammates, limit their exposure to high-pressure moments. Season goal: visible growth from Week 2 → Week 8.</p>
+    </div>
+
+    <div class="highlight">
+      <strong>Key insight:</strong> Your Tier 2 (Jordan, Luca) is what separates good coaches from bad ones. They're the difference between "Unit B gets blown out" and "Unit B holds steady." Maximize their value.
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ ROLES ================ -->
+<div class="section" id="roles">
+
+  <div class="card">
+    <h2>🎭 Player Role Cards</h2>
+    <p class="desc">Every Wolverine has a one-line job. Tell them their role — kids thrive when they know what's expected.</p>
+
+    <div class="role-card" style="border-left-color: var(--accent);">
+      <div class="role-header"><div class="role-name">Evan</div><span class="role-tag" style="background: var(--accent);">PG / #1 SCORER</span></div>
+      <div class="role-body">Runs the offense. Primary scorer. Lefty attacker. Leader. Ball is in his hands as much as legal.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "You're our quarterback AND our best scorer. Attack left — defenders won't expect it. Find Teddy and Jesse when they're open."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--accent);">
+      <div class="role-header"><div class="role-name">Teddy</div><span class="role-tag" style="background: var(--accent);">WING / #2 SCORER</span></div>
+      <div class="role-body">Top athlete, top scorer when Evan rests. Guards the opposing star. Runs the floor in transition.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "When Evan rests, you're our #1. Run in transition. Guard their best player. You're our stopper."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--accent);">
+      <div class="role-header"><div class="role-name">Jesse</div><span class="role-tag" style="background: var(--accent);">CENTER / #3 SCORER</span></div>
+      <div class="role-body">Best rebounder. Great off-ball. Shoots from 10+ feet. Sets screens, rolls hard.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "You own the glass. Screen for Evan, roll hard. When you get open 10 feet out, shoot it."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--green);">
+      <div class="role-header"><div class="role-name">Oren</div><span class="role-tag" style="background: var(--green);">BACKUP PG</span></div>
+      <div class="role-body">2nd-fastest straight-line. Runs the team when Evan sits. Calm. Can shoot from 10+.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "When Evan's on the bench, YOU run the team. Push in transition — that's your game."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--green);">
+      <div class="role-header"><div class="role-name">Ben</div><span class="role-tag" style="background: var(--green);">CENTER / INBOUNDER</span></div>
+      <div class="role-body">Tallest (tied with Jesse). Can shoot. BUT ball-stops — NOT a handler in flow. Screener, rebounder, inbounder, spot-up shooter.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "Two-dribble limit in half court. Set hard screens for Oren. When you're open 10 feet, shoot it."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--purple);">
+      <div class="role-header"><div class="role-name">Jordan</div><span class="role-tag" style="background: var(--purple); color: white;">6TH MAN / ANCHOR</span></div>
+      <div class="role-body">Your most important Tier 2 player. Anchors Unit B. Calm, reliable, moves the ball.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "When the starters sit, you're in charge out there. Be the calm one. Good passes, tough defense."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--purple);">
+      <div class="role-header"><div class="role-name">Luca</div><span class="role-tag" style="background: var(--purple); color: white;">UTILITY WING</span></div>
+      <div class="role-body">Tier 2. Decent lateral quickness. Role player who plays hard.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "Defense first. Move the ball fast. Simple plays only."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--blue);">
+      <div class="role-header"><div class="role-name">Akiva</div><span class="role-tag" style="background: var(--blue); color: white;">ENERGY GUY</span></div>
+      <div class="role-body">Tier 3. Tires fast. Short bursts of effort.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "4 minutes. GO HARD every second. Then rest."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--blue);">
+      <div class="role-header"><div class="role-name">Eli</div><span class="role-tag" style="background: var(--blue); color: white;">SIMPLE CATCH-AND-PASS</span></div>
+      <div class="role-body">Tier 3. Tires fast. Needs simple reads.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "Catch, pass quick. Stay close to Jordan. Rebound when the ball comes near."</div>
+    </div>
+
+    <div class="role-card" style="border-left-color: var(--red);">
+      <div class="role-header"><div class="role-name">Max</div><span class="role-tag" style="background: var(--red); color: white;">SCREENER / REBOUNDER</span></div>
+      <div class="role-body">Weakest player. No shooting. Pace gap. Simple role only: set screens, grab rebounds, make 1 pass, stay out of the way of stars.</div>
+      <div class="role-tips"><strong>Tell him:</strong> "Your job is hustle. Set a screen for Oren. Grab a rebound. Make ONE pass. That's a great Max shift."</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ RULES ================ -->
+<div class="section" id="rules">
+
+  <div class="card">
+    <h2>📏 The Lineup Rules</h2>
+    <p class="desc">Hard rules that govern every lineup decision.</p>
+
+    <div class="rule-card golden">
+      <span class="rule-tag">RULE #1</span>
+      <strong>Evan + Teddy — always together.</strong> Chemistry, leadership, scoring. Never split.
+    </div>
+
+    <div class="rule-card golden">
+      <span class="rule-tag">RULE #2</span>
+      <strong>At least 1 scorer (Evan, Teddy, or Jesse) on the floor at ALL times.</strong> Without one, you won't score. This is your hardest rule.
+    </div>
+
+    <div class="rule-card always">
+      <span class="rule-tag">ALWAYS</span>
+      <strong>Jordan plays with the weaker players.</strong> He's the Tier 2 anchor. When Akiva, Eli, or Max are on the floor, Jordan is there to steady them.
+    </div>
+
+    <div class="rule-card always">
+      <span class="rule-tag">ALWAYS</span>
+      <strong>Evan attacks LEFT.</strong> Lefty advantage. Drill it.
+    </div>
+
+    <div class="rule-card avoid">
+      <span class="rule-tag">AVOID</span>
+      <strong>Never play Max + Eli + Akiva on the floor together.</strong> You'll get steamrolled. Spread them across units.
+    </div>
+
+    <div class="rule-card avoid">
+      <span class="rule-tag">AVOID</span>
+      <strong>Never let Max or Eli be the primary option.</strong> They're not primary anything. Make sure a Tier 1 or Tier 2 player is initiating every possession they're on the floor for.
+    </div>
+
+    <div class="rule-card max">
+      <span class="rule-tag">MAX RULE</span>
+      <strong>Max sets a ball screen, then rolls or clears.</strong> That's his offense. No cuts into traffic. No dribbles. Screen, roll, rebound.
+    </div>
+
+    <div class="rule-card max">
+      <span class="rule-tag">MAX RULE</span>
+      <strong>On defense, Max guards their weakest player.</strong> Or zone up when he's in. Don't ask him to chase their best scorer.
+    </div>
+
+    <div class="rule-card golden">
+      <span class="rule-tag">BIG 3</span>
+      <strong>Big 3 (Evan, Teddy, Jesse) — at least 2 on floor together whenever possible.</strong> They're your only real scorers. When all 3 rest, offense dies.
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ UNITS ================ -->
+<div class="section" id="units">
+
+  <div class="card">
+    <h2>👥 The 2 Units (Rebalanced)</h2>
+    <p class="desc">Top 5 can't all play together under equal minutes rules. The key: split the Big 3 so each unit has a scorer.</p>
+
+    <div class="lineup-card a">
+      <div class="lineup-head">
+        <div class="lineup-title">🟢 UNIT A — "The Starters"</div>
+        <div class="when-badge">Shifts 1, 3, 5, 7<br>(starts each half)</div>
+      </div>
+      <div class="lineup-players">
+        <span class="lp">Evan<span class="role-subtitle">PG / Scorer</span></span>
+        <span class="lp">Teddy<span class="role-subtitle">Wing / Scorer</span></span>
+        <span class="lp">Ben<span class="role-subtitle">Center</span></span>
+        <span class="lp">Luca<span class="role-subtitle">Wing</span></span>
+        <span class="lp">Max<span class="role-subtitle">Screener</span></span>
+      </div>
+      <div class="lineup-desc">
+        <strong>Why this works:</strong> Evan + Teddy together (Rule #1). Ben as the center — size, can shoot from 10+, inbounds under pressure. Luca is your solid Tier 2 wing. Max hides here with 4 strong teammates around him — he sets screens, stays in the paint, doesn't hurt you.<br><br>
+        <strong>On the floor:</strong> <em>Evan creates, Teddy finishes, Ben screens and spaces, Luca defends and moves the ball, Max sets a screen then stays out of the way.</em><br><br>
+        <strong>Why Max is here (not Unit B):</strong> Putting Max with 4 strong players means the offense functions around him. If he's with Akiva/Eli/Jesse/Oren, you'd have 3 weak-ish guys on the floor. This spreads the weakness.
+      </div>
+    </div>
+
+    <div class="lineup-card b">
+      <div class="lineup-head">
+        <div class="lineup-title">🟣 UNIT B — "The Second Wave"</div>
+        <div class="when-badge">Shifts 2, 4, 6, 8<br>(comes in at 12:00 & 4:00)</div>
+      </div>
+      <div class="lineup-players">
+        <span class="lp">Oren<span class="role-subtitle">PG</span></span>
+        <span class="lp">Jesse<span class="role-subtitle">Scorer / Center</span></span>
+        <span class="lp">Jordan<span class="role-subtitle">Anchor</span></span>
+        <span class="lp">Akiva<span class="role-subtitle">Energy</span></span>
+        <span class="lp">Eli<span class="role-subtitle">Development</span></span>
+      </div>
+      <div class="lineup-desc">
+        <strong>Why this works:</strong> Oren runs point. Jesse is the anchor scorer (Rule #2 — at least 1 scorer always on floor). Jordan is the Tier 2 steady hand with the weaker guys. Akiva and Eli split here — two Tier 3 kids, but both surrounded by 3 strong players.<br><br>
+        <strong>On the floor:</strong> <em>Oren pushes tempo, Jesse rebounds and scores, Jordan steadies, Akiva brings energy, Eli plays simple.</em><br><br>
+        <strong>The trade-off:</strong> Unit B is weaker than Unit A. That's unavoidable. Your goal when Unit B is in: <strong>don't lose ground. Break even or lose by 2.</strong> If they hold serve, you win the game with Unit A's stretches.
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>🧩 Why this is better than v2:</strong> Putting Jesse (scorer #3) in Unit B gives that unit an actual scorer — it's not just all role players. Unit A keeps Evan + Teddy. Jordan anchors the weaker unit. Max is hidden among strong teammates. Every rule is satisfied.
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ SPECIAL LINEUPS ================ -->
+<div class="section" id="lineups">
+
+  <div class="card">
+    <h2>🎯 Situational Lineups</h2>
+    <p class="desc">For the 2-min free-sub window and critical moments.</p>
+
+    <div class="lineup-card close">
+      <div class="lineup-head">
+        <div class="lineup-title">🎯 CLOSING 5 — Final 2 Min</div>
+        <div class="when-badge">Close game<br>Must score / must stop</div>
+      </div>
+      <div class="lineup-players">
+        <span class="lp">Evan<span class="role-subtitle">Lefty attack</span></span>
+        <span class="lp">Teddy<span class="role-subtitle">Bucket</span></span>
+        <span class="lp">Jesse<span class="role-subtitle">Rebound / score</span></span>
+        <span class="lp">Oren<span class="role-subtitle">Ball relief</span></span>
+        <span class="lp">Ben<span class="role-subtitle">Screener / rebounder</span></span>
+      </div>
+      <div class="lineup-desc">
+        <strong>This is your Top 5.</strong> All 5 can shoot. All 5 have real skill. Only use this if the game is actually close and you're willing to burn the minutes.<br><br>
+        <strong>Last-possession play:</strong> Ben screens for Evan at the top. Evan rejects the screen and drives LEFT (lefty advantage). Teddy cuts to the rim. Jesse crashes the glass. Oren is your safety valve at the top. <em>Evan finishes lefty or kicks to Teddy/Jesse.</em>
+      </div>
+    </div>
+
+    <div class="lineup-card press">
+      <div class="lineup-head">
+        <div class="lineup-title">⚡ PRESS — We're Pressing</div>
+        <div class="when-badge">After made baskets<br>If trailing late</div>
+      </div>
+      <div class="lineup-players">
+        <span class="lp">Evan<span class="role-subtitle">Trap corner</span></span>
+        <span class="lp">Teddy<span class="role-subtitle">Trap corner</span></span>
+        <span class="lp">Jesse<span class="role-subtitle">Middle interceptor</span></span>
+        <span class="lp">Oren<span class="role-subtitle">Weakside</span></span>
+        <span class="lp">Jordan<span class="role-subtitle">Safety</span></span>
+      </div>
+      <div class="lineup-desc">
+        <strong>Why:</strong> Evan & Teddy have the best lateral quickness. Jesse's length covers middle. Oren jumps weakside pass. Jordan stays deep as safety.<br>
+        <strong>Coaching cue:</strong> "Trap sideline — no middle. Jordan, stay home!"
+      </div>
+    </div>
+
+    <div class="lineup-card break">
+      <div class="lineup-head">
+        <div class="lineup-title">🛡️ PRESS BREAK — They Press Us</div>
+        <div class="when-badge">Inbound play<br>Call timeout if needed</div>
+      </div>
+      <div class="lineup-players">
+        <span class="lp">Ben<span class="role-subtitle">🏀 INBOUNDER</span></span>
+        <span class="lp">Evan<span class="role-subtitle">Receives</span></span>
+        <span class="lp">Oren<span class="role-subtitle">Receives</span></span>
+        <span class="lp">Teddy<span class="role-subtitle">Middle sprinter</span></span>
+        <span class="lp">Jesse<span class="role-subtitle">Deep safety / layup</span></span>
+      </div>
+      <div class="lineup-desc">
+        <strong>Why:</strong> Ben's height = sees over the press, smart passes. Evan + Oren are both PGs so either side works. Teddy sprints middle. Jesse runs deep for the finish.<br>
+        <strong>Coaching cue:</strong> "Stay calm. Ben, find Teddy in the middle. Jesse, run to the rim."<br><br>
+        <strong>DRILL THIS until automatic.</strong> It'll make teams stop pressing you.
+      </div>
+    </div>
+
+    <div class="lineup-card a">
+      <div class="lineup-head">
+        <div class="lineup-title">📈 PROTECT LEAD / DEV MINUTES</div>
+        <div class="when-badge">Up big late<br>Develop Tier 2+3</div>
+      </div>
+      <div class="lineup-players">
+        <span class="lp">Oren<span class="role-subtitle">PG</span></span>
+        <span class="lp">Jordan<span class="role-subtitle">Anchor</span></span>
+        <span class="lp">Luca<span class="role-subtitle">Wing</span></span>
+        <span class="lp">Akiva<span class="role-subtitle">Minutes</span></span>
+        <span class="lp">Max<span class="role-subtitle">Minutes</span></span>
+      </div>
+      <div class="lineup-desc">
+        If you're up 15+, rest the stars. Oren and Jordan run the show. Give the bottom kids live reps — this is development gold.<br>
+        <strong>Rule:</strong> Only use with a safe lead. Don't press. Keep it simple.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ ROTATION CHART ================ -->
+<div class="section" id="rotation">
+
+  <div class="card">
+    <h2>⏱️ Full Game Rotation</h2>
+    <p class="desc">Units alternate every 4 min. Everyone hits 16 min clean (before free-sub window).</p>
+
+    <div class="half-divider">🏀 FIRST HALF</div>
+
+    <div class="shift-card a">
+      <div class="shift-head"><div class="shift-time">16:00 → 12:00</div><div class="shift-label">Shift 1 · Unit A</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Evan</span><span class="of-player star">Teddy</span><span class="of-player star">Ben</span><span class="of-player">Luca</span><span class="of-player">Max</span>
+      </div>
+    </div>
+
+    <div class="shift-card b">
+      <div class="shift-head"><div class="shift-time">12:00 → 8:00</div><div class="shift-label">Shift 2 · Unit B</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Oren</span><span class="of-player star">Jesse</span><span class="of-player">Jordan</span><span class="of-player">Akiva</span><span class="of-player">Eli</span>
+      </div>
+    </div>
+
+    <div class="shift-card a">
+      <div class="shift-head"><div class="shift-time">8:00 → 4:00</div><div class="shift-label">Shift 3 · Unit A</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Evan</span><span class="of-player star">Teddy</span><span class="of-player star">Ben</span><span class="of-player">Luca</span><span class="of-player">Max</span>
+      </div>
+    </div>
+
+    <div class="shift-card b">
+      <div class="shift-head"><div class="shift-time">4:00 → 0:00</div><div class="shift-label">Shift 4 · Unit B</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Oren</span><span class="of-player star">Jesse</span><span class="of-player">Jordan</span><span class="of-player">Akiva</span><span class="of-player">Eli</span>
+      </div>
+    </div>
+
+    <div class="half-divider">🏀 SECOND HALF</div>
+
+    <div class="shift-card a">
+      <div class="shift-head"><div class="shift-time">16:00 → 12:00</div><div class="shift-label">Shift 5 · Unit A</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Evan</span><span class="of-player star">Teddy</span><span class="of-player star">Ben</span><span class="of-player">Luca</span><span class="of-player">Max</span>
+      </div>
+    </div>
+
+    <div class="shift-card b">
+      <div class="shift-head"><div class="shift-time">12:00 → 8:00</div><div class="shift-label">Shift 6 · Unit B</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Oren</span><span class="of-player star">Jesse</span><span class="of-player">Jordan</span><span class="of-player">Akiva</span><span class="of-player">Eli</span>
+      </div>
+    </div>
+
+    <div class="shift-card a">
+      <div class="shift-head"><div class="shift-time">8:00 → 4:00</div><div class="shift-label">Shift 7 · Unit A</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Evan</span><span class="of-player star">Teddy</span><span class="of-player star">Ben</span><span class="of-player">Luca</span><span class="of-player">Max</span>
+      </div>
+    </div>
+
+    <div class="shift-card b">
+      <div class="shift-head"><div class="shift-time">4:00 → 2:00</div><div class="shift-label">Shift 8 · Unit B</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Oren</span><span class="of-player star">Jesse</span><span class="of-player">Jordan</span><span class="of-player">Akiva</span><span class="of-player">Eli</span>
+      </div>
+    </div>
+
+    <div class="shift-card close">
+      <div class="shift-head"><div class="shift-time">2:00 → 0:00 🔥</div><div class="shift-label" style="color: var(--pink);">Free Sub · CLOSING 5</div></div>
+      <div class="on-floor">
+        <span class="of-player star">Evan</span><span class="of-player star">Teddy</span><span class="of-player star">Jesse</span><span class="of-player star">Oren</span><span class="of-player star">Ben</span>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>Minutes math:</strong> After 30 min of standard rotation, everyone is at 15 min. In the final 2 min, your Top 5 closes → Evan, Teddy, Jesse, Oren, Ben go to 17 min each. Luca, Max, Jordan, Akiva, Eli stay at 15.<br><br>
+      <strong>If your league enforces STRICT equal minutes:</strong> Use closing 5 for just 1 min (60:00–61:00), then sub in a Tier 2/3 player (likely Jordan) for the final minute. Compromise: Closing 4 + Jordan.
+    </div>
+
+    <div class="warn">
+      <strong>⚠️ The reality:</strong> Unit B stretches (12:00 shifts) are where games are lost. If your opponent has even minutes requirements too, their Unit B is probably also weaker — so you break even. But if they stagger their stars into every shift... you'll bleed points in those 8 min. Just know that going in.
+    </div>
+  </div>
+
+</div>
+
+<!-- ================ MATCHUPS ================ -->
+<div class="section" id="matchups">
+
+  <div class="card">
+    <h2>🛡️ Defensive Matchups</h2>
+    <p class="desc">Who guards who, based on lateral quickness.</p>
+
+    <h3>When Unit A is in</h3>
+    <div class="matchup"><span class="matchup-our">Evan</span><span class="matchup-arrow">→</span><span class="matchup-their">Their fastest / handler</span></div>
+    <div class="matchup"><span class="matchup-our">Teddy</span><span class="matchup-arrow">→</span><span class="matchup-their">Their #1 scorer</span></div>
+    <div class="matchup"><span class="matchup-our">Ben</span><span class="matchup-arrow">→</span><span class="matchup-their">Their biggest player</span></div>
+    <div class="matchup"><span class="matchup-our">Luca</span><span class="matchup-arrow">→</span><span class="matchup-their">Their 3rd/4th player</span></div>
+    <div class="matchup"><span class="matchup-our">Max</span><span class="matchup-arrow">→</span><span class="matchup-their">Their WEAKEST player</span></div>
+
+    <div class="warn">
+      <strong>Max hide:</strong> If their weakest guy is still pretty good, switch to 2-3 zone with Unit A. Put Max on the weakside block where pace doesn't matter.
+    </div>
+
+    <h3 style="margin-top: 14px;">When Unit B is in</h3>
+    <div class="matchup"><span class="matchup-our">Oren</span><span class="matchup-arrow">→</span><span class="matchup-their">Their handler</span></div>
+    <div class="matchup"><span class="matchup-our">Jesse</span><span class="matchup-arrow">→</span><span class="matchup-their">Their scorer (when B in)</span></div>
+    <div class="matchup"><span class="matchup-our">Jordan</span><span class="matchup-arrow">→</span><span class="matchup-their">Their 2nd scorer</span></div>
+    <div class="matchup"><span class="matchup-our">Akiva</span><span class="matchup-arrow">→</span><span class="matchup-their">Their 3rd/4th</span></div>
+    <div class="matchup"><span class="matchup-our">Eli</span><span class="matchup-arrow">→</span><span class="matchup-their">Their weakest</span></div>
+
+    <div class="warn">
+      <strong>Unit B reality:</strong> This group will struggle defensively. Strongly consider 2-3 zone when Unit B is in — protects Akiva and Eli from being exposed 1-on-1.
+    </div>
+
+    <h3 style="margin-top: 14px;">🎲 Situational Matchups</h3>
+
+    <div class="sit-card">
+      <div class="sit-title">Opponent has a dominant scorer</div>
+      <p><strong>Unit A:</strong> Teddy locks him up.<br>
+      <strong>Unit B:</strong> Jordan takes him — call timeout and switch to zone if it's a mismatch. Hide Akiva/Eli/Max.</p>
+    </div>
+
+    <div class="sit-card">
+      <div class="sit-title">Opponent has a tall post</div>
+      <p><strong>Unit A:</strong> Ben fronts him, Teddy digs from the wing.<br>
+      <strong>Unit B:</strong> Jesse bodies him up (he's your big when Unit B is in).</p>
+    </div>
+
+    <div class="sit-card">
+      <div class="sit-title">Opponent is faster than us</div>
+      <p>Zone up — 2-3 zone forces them to shoot over the top. Most 9yo teams can't. Bonus: hides your weaker defenders.</p>
+    </div>
+
+    <div class="sit-card">
+      <div class="sit-title">They start pressing</div>
+      <p>Call a timeout if Ben isn't already on the floor. Get him in to inbound. Run the press-break set.</p>
+    </div>
+
+    <div class="sit-card">
+      <div class="sit-title">We're getting killed with Unit B in</div>
+      <p>Switch to zone. Double-team their best scorer. Tell Jesse to play free-safety. Survive.</p>
+    </div>
+
+    <div class="sit-card">
+      <div class="sit-title">Max is getting picked on</div>
+      <p>Zone up. Or double-team into Max's area. He shouldn't be 1-on-1 against their best guy ever.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
